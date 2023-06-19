@@ -1,0 +1,25 @@
+<mxfile host="65bd71144e">
+    <diagram id="IeXrpqdkAAdzAg8FQPEK" name="Page-1">
+        <mxGraphModel dx="723" dy="483" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+            <root>
+                <mxCell id="0"/>
+                <mxCell id="1" parent="0"/>
+                <mxCell id="8" value="Data Warehouse" style="swimlane;whiteSpace=wrap;html=1;fontSize=9;" vertex="1" parent="1">
+                    <mxGeometry x="160" y="40" width="280" height="320" as="geometry"/>
+                </mxCell>
+                <mxCell id="7" value="Github&lt;br&gt;Dev" style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;size=15;fontSize=9;" vertex="1" parent="8">
+                    <mxGeometry x="190" y="70" width="60" height="80" as="geometry"/>
+                </mxCell>
+                <mxCell id="6" value="&lt;font style=&quot;font-size: 9px;&quot;&gt;Staking&lt;br&gt;Data&lt;/font&gt;" style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;size=15;" vertex="1" parent="8">
+                    <mxGeometry x="40" y="70" width="60" height="80" as="geometry"/>
+                </mxCell>
+                <mxCell id="5" value="&lt;font style=&quot;font-size: 9px;&quot;&gt;Governance&lt;/font&gt;" style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;size=15;" vertex="1" parent="8">
+                    <mxGeometry x="190" y="210" width="60" height="80" as="geometry"/>
+                </mxCell>
+                <mxCell id="4" value="&lt;font style=&quot;font-size: 8px;&quot;&gt;NFT&lt;br&gt;Marketplace&lt;/font&gt;" style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;size=15;" vertex="1" parent="8">
+                    <mxGeometry x="40" y="210" width="60" height="80" as="geometry"/>
+                </mxCell>
+            </root>
+        </mxGraphModel>
+    </diagram>
+</mxfile>

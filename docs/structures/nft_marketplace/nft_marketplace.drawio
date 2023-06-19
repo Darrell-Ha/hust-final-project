@@ -1,0 +1,116 @@
+<mxfile host="65bd71144e">
+    <diagram id="zaUc7EDm60EPRwr9rcl4" name="Page-1">
+        <mxGraphModel dx="1518" dy="1014" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+            <root>
+                <mxCell id="0"/>
+                <mxCell id="1" parent="0"/>
+                <mxCell id="3" value="NFT Marketplace flow" style="swimlane;whiteSpace=wrap;html=1;" parent="1" vertex="1">
+                    <mxGeometry width="1030" height="380" as="geometry"/>
+                </mxCell>
+                <mxCell id="4" value="Data sources" style="swimlane;whiteSpace=wrap;html=1;" parent="3" vertex="1">
+                    <mxGeometry y="30" width="160" height="350" as="geometry"/>
+                </mxCell>
+                <mxCell id="23" value="" style="shape=image;verticalLabelPosition=bottom;labelBackgroundColor=default;verticalAlign=top;aspect=fixed;imageAspect=0;image=https://moonbeans.io/images/logo/logo.png;" parent="4" vertex="1">
+                    <mxGeometry x="20" y="60" width="44.72" height="50" as="geometry"/>
+                </mxCell>
+                <mxCell id="26" value="Moonbeans.io" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;" parent="4" vertex="1">
+                    <mxGeometry x="60" y="72" width="100" height="30" as="geometry"/>
+                </mxCell>
+                <mxCell id="27" value="" style="shape=image;verticalLabelPosition=bottom;labelBackgroundColor=default;verticalAlign=top;aspect=fixed;imageAspect=0;image=https://thecronicle.com/wp-content/uploads/2022/01/light_round.png;" parent="4" vertex="1">
+                    <mxGeometry x="20" y="148" width="50" height="50" as="geometry"/>
+                </mxCell>
+                <mxCell id="28" value="Tofunft" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;" parent="4" vertex="1">
+                    <mxGeometry x="80" y="160" width="60" height="30" as="geometry"/>
+                </mxCell>
+                <mxCell id="29" value="" style="shape=image;verticalLabelPosition=bottom;labelBackgroundColor=default;verticalAlign=top;aspect=fixed;imageAspect=0;image=https://styles.redditmedia.com/t5_4mk0p1/styles/communityIcon_zfy3e4ecf1671.png;" parent="4" vertex="1">
+                    <mxGeometry x="20.68" y="239" width="49.32" height="50" as="geometry"/>
+                </mxCell>
+                <mxCell id="30" value="NFTrade" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;" parent="4" vertex="1">
+                    <mxGeometry x="69.32" y="249" width="70" height="30" as="geometry"/>
+                </mxCell>
+                <mxCell id="9" value="Staging" style="swimlane;whiteSpace=wrap;html=1;" parent="3" vertex="1">
+                    <mxGeometry x="300" y="30" width="175" height="350" as="geometry"/>
+                </mxCell>
+                <mxCell id="20" value="Raw DB" style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;size=15;" parent="9" vertex="1">
+                    <mxGeometry x="32" y="102" width="111" height="150" as="geometry"/>
+                </mxCell>
+                <mxCell id="40" value="" style="shape=image;verticalLabelPosition=bottom;labelBackgroundColor=default;verticalAlign=top;aspect=fixed;imageAspect=0;image=https://upload.wikimedia.org/wikipedia/commons/thumb/2/29/Postgresql_elephant.svg/640px-Postgresql_elephant.svg.png;" parent="9" vertex="1">
+                    <mxGeometry x="67.63" y="260" width="39.74" height="41" as="geometry"/>
+                </mxCell>
+                <mxCell id="31" style="edgeStyle=none;html=1;entryX=0;entryY=0.25;entryDx=0;entryDy=0;" parent="3" source="26" target="9" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="32" value="Extract" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;" parent="3" vertex="1">
+                    <mxGeometry x="189" y="85" width="60" height="30" as="geometry"/>
+                </mxCell>
+                <mxCell id="34" style="edgeStyle=none;html=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;exitX=1;exitY=0.5;exitDx=0;exitDy=0;" parent="3" source="4" target="9" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="35" style="edgeStyle=none;html=1;entryX=0;entryY=0.75;entryDx=0;entryDy=0;" parent="3" target="9" edge="1">
+                    <mxGeometry relative="1" as="geometry">
+                        <mxPoint x="160" y="293" as="sourcePoint"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="38" value="Response API" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;" parent="3" vertex="1">
+                    <mxGeometry x="169" y="210" width="100" height="30" as="geometry"/>
+                </mxCell>
+                <mxCell id="39" value="Response API" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;" parent="3" vertex="1">
+                    <mxGeometry x="169" y="300" width="100" height="30" as="geometry"/>
+                </mxCell>
+                <mxCell id="33" value="Response API" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;" parent="3" vertex="1">
+                    <mxGeometry x="169" y="115" width="100" height="30" as="geometry"/>
+                </mxCell>
+                <mxCell id="52" value="" style="shape=image;verticalLabelPosition=bottom;labelBackgroundColor=default;verticalAlign=top;aspect=fixed;imageAspect=0;image=https://o.remove.bg/downloads/58e9af4a-86fa-42e4-a72d-346ccbcf14ba/518-5188627_apache-airflow-documentation-airflow-documentation-apache-airflow-logo-removebg-preview.png;" parent="3" vertex="1">
+                    <mxGeometry x="249" y="90" width="22.37" height="20" as="geometry"/>
+                </mxCell>
+                <mxCell id="60" value="ETL process" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" parent="3" vertex="1">
+                    <mxGeometry x="520" y="170" width="60" height="30" as="geometry"/>
+                </mxCell>
+                <mxCell id="61" value="" style="shape=image;verticalLabelPosition=bottom;labelBackgroundColor=default;verticalAlign=top;aspect=fixed;imageAspect=0;image=https://o.remove.bg/downloads/58e9af4a-86fa-42e4-a72d-346ccbcf14ba/518-5188627_apache-airflow-documentation-airflow-documentation-apache-airflow-logo-removebg-preview.png;" parent="3" vertex="1">
+                    <mxGeometry x="580" y="175" width="22.37" height="20" as="geometry"/>
+                </mxCell>
+                <mxCell id="85" style="edgeStyle=none;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;exitPerimeter=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" parent="3" source="77" target="80" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="77" value="Data Warehouse" style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;size=15;" parent="3" vertex="1">
+                    <mxGeometry x="630" y="130" width="111" height="150" as="geometry"/>
+                </mxCell>
+                <mxCell id="59" style="edgeStyle=none;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;entryPerimeter=0;" parent="3" source="9" target="77" edge="1">
+                    <mxGeometry relative="1" as="geometry">
+                        <mxPoint x="618.9999999999998" y="205" as="targetPoint"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="80" value="Analytics" style="swimlane;whiteSpace=wrap;html=1;" parent="3" vertex="1">
+                    <mxGeometry x="850" y="105" width="170" height="200" as="geometry"/>
+                </mxCell>
+                <mxCell id="89" value="" style="shape=image;verticalLabelPosition=bottom;labelBackgroundColor=default;verticalAlign=top;aspect=fixed;imageAspect=0;image=https://www.nicepng.com/png/full/269-2693339_data-flowing-into-superset-superset-logo-apache-superset.png;" parent="80" vertex="1">
+                    <mxGeometry x="24.539999999999964" y="50" width="120.93" height="20" as="geometry"/>
+                </mxCell>
+                <mxCell id="90" value="" style="shape=image;verticalLabelPosition=bottom;labelBackgroundColor=default;verticalAlign=top;aspect=fixed;imageAspect=0;image=https://pei.com/wp-content/uploads/2016/08/maxresdefaultreduced.jpg;" parent="80" vertex="1">
+                    <mxGeometry x="24.539999999999964" y="115" width="128.08" height="50" as="geometry"/>
+                </mxCell>
+                <mxCell id="83" value="Load" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;" parent="3" vertex="1">
+                    <mxGeometry x="765" y="210" width="50" height="30" as="geometry"/>
+                </mxCell>
+                <mxCell id="36" value="Extract" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;" parent="1" vertex="1">
+                    <mxGeometry x="189" y="175" width="60" height="30" as="geometry"/>
+                </mxCell>
+                <mxCell id="37" value="Extract" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;" parent="1" vertex="1">
+                    <mxGeometry x="189" y="265" width="60" height="30" as="geometry"/>
+                </mxCell>
+                <mxCell id="53" value="" style="shape=image;verticalLabelPosition=bottom;labelBackgroundColor=default;verticalAlign=top;aspect=fixed;imageAspect=0;image=https://o.remove.bg/downloads/58e9af4a-86fa-42e4-a72d-346ccbcf14ba/518-5188627_apache-airflow-documentation-airflow-documentation-apache-airflow-logo-removebg-preview.png;" parent="1" vertex="1">
+                    <mxGeometry x="250" y="177" width="22.37" height="20" as="geometry"/>
+                </mxCell>
+                <mxCell id="54" value="" style="shape=image;verticalLabelPosition=bottom;labelBackgroundColor=default;verticalAlign=top;aspect=fixed;imageAspect=0;image=https://o.remove.bg/downloads/58e9af4a-86fa-42e4-a72d-346ccbcf14ba/518-5188627_apache-airflow-documentation-airflow-documentation-apache-airflow-logo-removebg-preview.png;" parent="1" vertex="1">
+                    <mxGeometry x="250" y="269" width="22.37" height="20" as="geometry"/>
+                </mxCell>
+                <mxCell id="79" value="" style="shape=image;verticalLabelPosition=bottom;labelBackgroundColor=default;verticalAlign=top;aspect=fixed;imageAspect=0;image=https://upload.wikimedia.org/wikipedia/commons/thumb/2/29/Postgresql_elephant.svg/640px-Postgresql_elephant.svg.png;" parent="1" vertex="1">
+                    <mxGeometry x="667.63" y="291" width="39.74" height="41" as="geometry"/>
+                </mxCell>
+                <mxCell id="82" value="Transform" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;" parent="1" vertex="1">
+                    <mxGeometry x="750" y="175" width="80" height="30" as="geometry"/>
+                </mxCell>
+            </root>
+        </mxGraphModel>
+    </diagram>
+</mxfile>
