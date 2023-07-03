@@ -56,6 +56,11 @@ Các ứng dụng mà ta thường dùng ngày nay như đặt xe, ngân hàng, 
 
 Hệ thống quản lý cơ sở dữ liệu hoạt động (*Operational Database System*) là hệ thống được sử dụng để thực hiện xử lý các giao dịch trực tuyến và truy vấn. Các giao dịch trực tuyến để hình dung thì có thể được minh họa thông qua các ví dụ tương tác với ứng dụng được nêu ở trên. Mỗi một lần đặt xe, hệ thống đã phát sinh thêm một giao dịch trực tuyến và cần được xử lý tốt để đảm bảo tính nhất quán và toàn vẹn dữ liệu cho toàn bộ dữ liệu. Một cách nói khác, các hệ thống quản lý cơ sở dữ liệu hoạt động còn được gọi là một hệ thống OLTP (*Online Transaction Processing*) -->
 
+#### 1.4 Một số kiểu kho dữ liệu thường được áp dụng
+
+Phụ thuộc vào bài toán cần giải quyết, kho dữ liệu cũng cần được triển khai một cách phù hợp vừa để giải quyết bài toán, đáp ứng nhu cầu và còn cần để đáp ứng được điều kiện triển khai giải pháp.
+
+**Kho dữ liệu doanh nghiệp**: Đây là kiếu kho dữ liệu tập trung, phân tích tất cả thông tin về các chủ đề liên quan đến tổ chức, doanh nghiệp. Giải pháp này cung cấp tính khả dụng và khả năng truy cập đến với nguồn dữ liệu xuyên suốt trong toàn bộ tổ chức. Thông thường, nó chứa dữ liệu chi tiết cũng như dữ liệu tổng hợp. Nguồn cũng cấp dữ liệu cho doanh nghiệp có thể là từ các hệ thống vận hành hay giao dịch (các hệ thống ERP, CRM, ứng dụng, các thiết bị IoT,...). Dung lượng dữ liệu có kích thước có thể lên đến từ vài gigabyte (GB) đến hàng trăm gigabyte, terabyte hoặc thậm chí nhiều hơn. Một kho dữ liệu doanh nghiệp có thể được triển khai trên máy tính, server truyền thống hoặc các nền tảng kiến trúc song song. Tuy nhiên, nó yêu cầu mô hình kinh doanh chi tiết và có thể mất nhiều năm để thiết kế và xây dựng.
 
 
 
