@@ -13,8 +13,8 @@ I. [Kho dữ liệu và cách thức triển khai](#i-kho-dữ-liệu-và-cách-
     1.1 [Khái niệm](#11-khái-niệm)
 
     1.2 [Các đặc tính của kho dữ liệu](#12-các-đặc-tính-của-kho-dữ-liệu)
-<!-- 
-    1.3 [Phân biệt với hệ thống xử lý giao dịch trực tuyến (OLTP)](#13-phân-biệt-với-hệ-thống-xử-lý-giao-dịch-trực-tuyến-oltp) -->
+
+    1.3 [Một số kiểu kho dữ liệu thường được áp dụng](#13-một-số-kiểu-kho-dữ-liệu-thường-được-áp-dụng)
 
 [II. Bài toán phân tích dữ liệu hệ thống Multi-chain](#ii-bài-toán-phân-tích-dữ-liệu-hệ-thống-multi-chain)
 
@@ -50,13 +50,7 @@ Theo *William H. Inmon* - kiến trúc sư hàng đầu trong việc xây dựng
 
 Tựu chung lại, xây dựng kho dữ liệu tức áp dụng một kiểu kiến trúc lưu trữ dữ liệu từ nhiều nguồn một cách nhất quán để triển khai hạ tầng vật lý cho mô hình dữ liệu nhằm đáp ứng nhu cầu phân tích, báo cáo và hỗ trợ ra quyết định cho tổ chức, doanh nghiệp.
 
-<!-- #### 1.3. Phân biệt với hệ thống xử lý giao dịch trực tuyến (OLTP)
-
-Các ứng dụng mà ta thường dùng ngày nay như đặt xe, ngân hàng, đặt bàn ở nhà hàng,... đều đã đi vào cuộc sống hàng ngày và trở thành những dịch vụ trực tuyến hữu ích, đáp ứng đủ những nhu cầu về mặt tiêu dùng cho người sử dụng. Để các ứng dụng hoạt động trơn tru đều một phần đến từ việc xây dựng và ứng dụng tốt các hệ thống quản lý cơ sở dữ liệu hoạt động.
-
-Hệ thống quản lý cơ sở dữ liệu hoạt động (*Operational Database System*) là hệ thống được sử dụng để thực hiện xử lý các giao dịch trực tuyến và truy vấn. Các giao dịch trực tuyến để hình dung thì có thể được minh họa thông qua các ví dụ tương tác với ứng dụng được nêu ở trên. Mỗi một lần đặt xe, hệ thống đã phát sinh thêm một giao dịch trực tuyến và cần được xử lý tốt để đảm bảo tính nhất quán và toàn vẹn dữ liệu cho toàn bộ dữ liệu. Một cách nói khác, các hệ thống quản lý cơ sở dữ liệu hoạt động còn được gọi là một hệ thống OLTP (*Online Transaction Processing*) -->
-
-#### 1.4 Một số kiểu kho dữ liệu thường được áp dụng
+#### 1.3 Một số kiểu kho dữ liệu thường được áp dụng
 
 Phụ thuộc vào bài toán cần giải quyết, kho dữ liệu cũng cần được triển khai một cách phù hợp vừa để giải quyết bài toán, đáp ứng nhu cầu và còn cần để đáp ứng được điều kiện triển khai giải pháp.
 
@@ -64,10 +58,16 @@ Phụ thuộc vào bài toán cần giải quyết, kho dữ liệu cũng cần 
 
 **Data mart**: Giả sử như ta có một kho dữ liệu khổng lồ được mọi cá nhân trong tổ chức sử dụng. Người làm tiếp thị cần sử dụng dữ liệu để phân tích thì cần những dữ liệu liên quan đến khách hàng, sản phẩm, doanh thu,... để đưa ra những chiến lược phù hợp cho hoạt động kinh doanh. Trong khi đó, người làm quản lý nhân sự trong tổ chức thì cần sử dụng những dữ liệu về nhân sự, thành tích, khảo sát, chi phí, tuyển dụng,... để nắm rõ tình hình nội tại từ đó đưa ra những quyết định, chiến lược để cải thiện chất lượng nhân sự, văn hóa doanh nghiệp. Mỗi một vai trò công việc cần sử dụng những dữ liệu chủ đề khác nhau. Đáp ứng điều đó, data mart là một chiến lược áp dụng tốt khi sử dụng những kho dữ liệu nhỏ được phân loại theo hướng chủ đề như bán hàng, nhân sự, tài chính,... trong một tổ chức. Data mart thường được triển khai trên các máy chủ chi phí thấp dựa trên Unix/Linux hoặc Windows. Chu kỳ triển khai của một siêu thị dữ liệu có nhiều khả năng được đo bằng tuần hơn là tháng hoặc năm. Tuy nhiên, nó có thể liên quan đến sự tích hợp phức tạp trong thời gian dài nếu thiết kế và lập kế hoạch của nó không áp dụng cho toàn doanh nghiệp. Tùy thuộc vào nguồn dữ liệu, data mart có thể được thiết kế độc lập hay là phụ thuộc vào kho dữ liệu tổng của doanh nghiệp. Các data mart độc lập sẽ được cung cấp dữ liệu từ một hoặc nhiều hệ thống vận hành bên ngoài hoặc cục bộ trong một bộ phận cụ thể. Data mart phụ thuộc được coi là một thành phần con trong kho dữ liệu của doanh nghiệp.
 
-
-
-
 ### 2. Mô hình xây dựng kho dữ liệu
+
+#### 2.1 Kĩ thuật mô hình hóa đa chiều
+
+Kho dữ liệu là nơi tập trung một khối lượng lớn dữ liệu với mục tiêu giải quyết các bài toán thực tiễn mà doanh nghiệp gặp phải thông qua việc phân tích dữ liệu lịch sử (*business intelligence*). Quá trình xây dựng kho dữ liệu sẽ đi song hành với nhu cầu phân tích kinh doanh của tổ chức. Từ việc làm sao để truy cập được vào dữ liệu lớn, làm sao truy vấn được một cách dễ dàng,... cho đến việc làm sao để đưa ra những điểm nhấn quan trọng (*insights*) và làm sao để hỗ trợ việc ra quyết định chuẩn xác nhất, đáng tin cậy nhất. Và cuối cùng, có một phương pháp đã được rộng rãi các kĩ sư dữ liệu đánh giá cao trong việc mô hình hóa kho dữ liệu để đảm bảo được hai tiêu chí quan trọng: Dữ liệu truy vấn **dễ hiểu, dễ tiếp cận** đối với người dùng. Kĩ thuật đó được gọi với cái tên **Dimension Modeling** hay tạm dịch là Mô hình hóa đa chiều.
+
+Kĩ thuật mô hình hóa đa chiều giúp người thiết kế kho dữ liệu nhanh chóng tạo nên các lược đồ cơ sở dữ liệu dễ hiểu để các nhà phân tích có thể khai thác tốt cho nhu cầu của mình. Ở các cơ sở dữ liệu vận hành, ta cần chuẩn hóa kĩ càng các lược đồ thành 2NF, 3NF, BCNF, ... để đảm bảo dữ liệu 
+
+Đi kèm với đó là khả năng truy vấn và tổng hợp dữ liệu mạnh mẽ nhờ vào việc phân tách rõ các chiều dữ liệu, .
+
 
 ### 3. 
 
