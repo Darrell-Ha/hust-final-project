@@ -64,9 +64,14 @@ Phụ thuộc vào bài toán cần giải quyết, kho dữ liệu cũng cần 
 
 Kho dữ liệu là nơi tập trung một khối lượng lớn dữ liệu với mục tiêu giải quyết các bài toán thực tiễn mà doanh nghiệp gặp phải thông qua việc phân tích dữ liệu lịch sử (*business intelligence*). Quá trình xây dựng kho dữ liệu sẽ đi song hành với nhu cầu phân tích kinh doanh của tổ chức. Từ việc làm sao để truy cập được vào dữ liệu lớn, làm sao truy vấn được một cách dễ dàng,... cho đến việc làm sao để đưa ra những điểm nhấn quan trọng (*insights*) và làm sao để hỗ trợ việc ra quyết định chuẩn xác nhất, đáng tin cậy nhất. Và cuối cùng, có một phương pháp đã được rộng rãi các kĩ sư dữ liệu đánh giá cao trong việc mô hình hóa kho dữ liệu để đảm bảo được hai tiêu chí quan trọng: Dữ liệu truy vấn **dễ hiểu, dễ tiếp cận** đối với người dùng. Kĩ thuật đó được gọi với cái tên **Dimension Modeling** hay tạm dịch là Mô hình hóa đa chiều.
 
-Kĩ thuật mô hình hóa đa chiều giúp người thiết kế kho dữ liệu nhanh chóng tạo nên các lược đồ cơ sở dữ liệu dễ hiểu để các nhà phân tích có thể khai thác tốt cho nhu cầu của mình. Ở các cơ sở dữ liệu vận hành, ta cần chuẩn hóa kĩ càng các lược đồ thành 2NF, 3NF, BCNF, ... để đảm bảo dữ liệu 
+Kĩ thuật mô hình hóa đa chiều giúp người thiết kế kho dữ liệu nhanh chóng tạo nên các lược đồ cơ sở dữ liệu dễ hiểu để các nhà phân tích có thể khai thác tốt cho nhu cầu của mình. Ở các cơ sở dữ liệu vận hành, ta cần chuẩn hóa kĩ càng các lược đồ thành 2NF, 3NF, BCNF, ... để đảm bảo dữ liệu luôn đảm bảo tính nhất quán và toàn vẹn dữ liệu, phục vụ cho việc thực thi và xử lý cho các giao dịch trực tuyến. Các bảng dữ liệu cũng sẽ có kích thước và khối lượng vừa phải, thuận tiện trong việc thực hiện các thao tác CRUD. Tuy nhiên, trong kho dữ liệu, khối lượng và kích thước của dữ liệu sẽ ngày càng tăng lên. Việc chuẩn hóa dữ liệu chặt chẽ sẽ dẫn đến khó khăn trong việc mở rộng mô hình, mất đi ý nghĩa phân tích chuyên sâu mà kho dữ liệu cần đáp ứng và độ phức tạp của truy vấn sẽ là điều không thể tránh khỏi. Kĩ thuật hóa đa chiều đánh giá các yếu tố như các thứ nguyên để nhìn nhận sự phân tích (*dimensions*) - đại diện cho các thực thể kinh doanh và chủ điểm phân tích (*facts*) - đại diện cho các phép đo. Hai yếu tố này kết hợp với nhau tạo nên những mức độ biểu thị linh hoạt cho các tri thức khác nhau thu được từ dữ liệu. Áp dụng kĩ thuật mô hình hóa đa chiều khi tạo nên các lược đồ dữ liệu tạo nên một số mô hình có thể kể đến như sau: *lược đồ hình sao (star-schema)*, *lược đồ hình bông tuyết (snowflakes-schema)*, *lược đồ thiên hà (galaxy-schema)*.
 
-Đi kèm với đó là khả năng truy vấn và tổng hợp dữ liệu mạnh mẽ nhờ vào việc phân tách rõ các chiều dữ liệu, .
+#### 2.2 Lược đồ hình sao
+
+Mô hình dữ liệu đa chiều được triển khai trên các cơ sở dữ liệu quan hệ sẽ có cấu trúc giống như hình sao. Với bảng dữ liệu của chủ điểm phân tích (*facts*) ở giữa chứa lượng lớn bản ghi độc lập và được liên kết với một nhóm các bảng tương ứng với các thứ nguyên, lược đồ của kho dữ liệu tương ứng với một chủ điểm phân tích vì thế mới có hình dạng như vậy và được gọi làm tên gọi cho mô hình đang xét.
+
+![Lược đồ hình sao](./img/star-schema.png)
+
 
 
 ### 3. 
