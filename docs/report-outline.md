@@ -66,11 +66,45 @@ Kho dữ liệu là nơi tập trung một khối lượng lớn dữ liệu v�
 
 Kĩ thuật mô hình hóa đa chiều giúp người thiết kế kho dữ liệu nhanh chóng tạo nên các lược đồ cơ sở dữ liệu dễ hiểu để các nhà phân tích có thể khai thác tốt cho nhu cầu của mình. Ở các cơ sở dữ liệu vận hành, ta cần chuẩn hóa kĩ càng các lược đồ thành 2NF, 3NF, BCNF, ... để đảm bảo dữ liệu luôn đảm bảo tính nhất quán và toàn vẹn dữ liệu, phục vụ cho việc thực thi và xử lý cho các giao dịch trực tuyến. Các bảng dữ liệu cũng sẽ có kích thước và khối lượng vừa phải, thuận tiện trong việc thực hiện các thao tác CRUD. Tuy nhiên, trong kho dữ liệu, khối lượng và kích thước của dữ liệu sẽ ngày càng tăng lên. Việc chuẩn hóa dữ liệu chặt chẽ sẽ dẫn đến khó khăn trong việc mở rộng mô hình, mất đi ý nghĩa phân tích chuyên sâu mà kho dữ liệu cần đáp ứng và độ phức tạp của truy vấn sẽ là điều không thể tránh khỏi. Kĩ thuật hóa đa chiều đánh giá các yếu tố như các thứ nguyên để nhìn nhận sự phân tích (*dimensions*) - đại diện cho các thực thể kinh doanh và chủ điểm phân tích (*facts*) - đại diện cho các phép đo. Hai yếu tố này kết hợp với nhau tạo nên những mức độ biểu thị linh hoạt cho các tri thức khác nhau thu được từ dữ liệu. Áp dụng kĩ thuật mô hình hóa đa chiều khi tạo nên các lược đồ dữ liệu tạo nên một số mô hình có thể kể đến như sau: *lược đồ hình sao (star-schema)*, *lược đồ hình bông tuyết (snowflakes-schema)*, *lược đồ thiên hà (galaxy-schema)*.
 
-#### 2.2 Lược đồ hình sao
+##### 2.1.1 Lược đồ hình sao
 
-Mô hình dữ liệu đa chiều được triển khai trên các cơ sở dữ liệu quan hệ sẽ có cấu trúc giống như hình sao. Với bảng dữ liệu của chủ điểm phân tích (*facts*) ở giữa chứa lượng lớn bản ghi độc lập và được liên kết với một nhóm các bảng tương ứng với các thứ nguyên, lược đồ của kho dữ liệu tương ứng với một chủ điểm phân tích vì thế mới có hình dạng như vậy và được gọi làm tên gọi cho mô hình đang xét.
+Mô hình dữ liệu đa chiều được triển khai trên các cơ sở dữ liệu quan hệ sẽ có cấu trúc giống như hình sao - *star-schema*. Với bảng dữ liệu của chủ điểm phân tích (*facts*) ở giữa chứa lượng lớn bản ghi độc lập và được liên kết với một nhóm các bảng tương ứng với các thứ nguyên. Lược đồ của kho dữ liệu tương ứng với một chủ điểm phân tích vì thế sẽ có hình dạng sao và được dùng làm tên gọi cho mô hình.
 
 ![Lược đồ hình sao](./img/star-schema.png)
+
+Trên đây là một minh họa cho lược đồ hình sao với chủ điểm phân tích nằm ở bảng *fact_sale* chứa một lượng dữ liệu. Trong bảng, các trường gồm có các phép đo lường như *price*, *quantity* và các trường khóa ngoại liên kết với các bảng các thứ nguyên gồm *dim\_time*, *dim\_product*, *dim\_store*, *dim\_customer*, *dim\_sale\_type*.
+
+Như vậy ta thấy được rằng lược đồ hình sao là một lược đồ dễ dàng để triển khai và xây dựng. Quá trình trính xuất, biến đổi và tải (**ETL** - *Extract, Transform, Load*) được đơn giản hóa khi mà dữ liệu vừa được tải vào bảng fact và tải trực tiếp vào các bảng thứ nguyên dựa theo giá trị của các khóa ngoại. Không chỉ vậy, sử dụng lược đồ hình sao cũng tạo nên nhiều thuận tiện trong quá trình phân tích. Việc phân tích các chủ điểm phân tích ta sẽ sử dụng chủ yếu các phép JOIN và các toán tử tổng hợp như COUNT, SUM,... dựa theo một số phép đo đã được tính toán trong bảng fact. Người phân tích có thể thực hiện tốt các phân tích đi từ tổng quát đến chi tiết qua các phép truy vấn JOIN giữa bảng fact và các bảng dim khác nhau. Chẳng hạn với ví dụ lược đò ở trên, ngoài việc ta có thể biết được doanh thu của toàn bộ cửa hàng trong một quý là bao nhiêu:
+
+```sql
+SELECT SUM(price)
+FROM fact_sale fs
+JOIN dim_time dt
+USING (time_id)
+WHERE dt.quarter = 2
+
+```
+
+ta còn có thể biết được thêm trong quý đó, cửa hàng nào ở thành phố *A* là có doanh số tốt nhất:
+
+```sql
+SELECT ds.store_id AS store, SUM(quantity) AS quantities_in_quarter_2
+FROM fact_sale fs
+JOIN dim_time dt
+ON fs.time_id = dt.time_id
+JOIN dim_store ds
+ON fa.store_id = ds.store_id
+WHERE dt.quarter = 2
+    AND ds.city = 'A'
+GROUP BY ds.store_id
+ORDER BY quantities_in_quarter_2
+```
+
+Tùy vào mức độ chi tiết của câu hỏi, câu truy vấn sẽ cần thực hiện một só phép JOIN nhất định. Mặc dù cần thực hiện nhiều phép truy vấn như vậy nhưng nhờ vào việc cấu trúc của lược đồ hình sao là đơn giản nên việc thực hiện các phép truy vấn phức tạp vẫn duy trì một tốc độ rất tốt và hiệu quả.
+
+Tuy nhiên, cũng vì sự đơn giản đó mà lược đồ hình sao không thể đảm bảo được tính giảm thiểu đi dư thừa dữ liệu nằm ở các bảng thứ nguyên. Giả sư như trong bảng *dim\_store*, trường *country* chắc chắn sẽ có nhiều dữ liệu lặp đi lặp lại và chi phí bộ nhớ sẽ là đáng kể nếu như bảng có số lượng bản ghi lớn. Chưa kể đến việc mối quan hệ giữa bảng dim-fact là mối quan hệ nhiều-nhiều (*many-to-many*) sẽ là một bài toán khó hơn cho lược đồ này.
+
+##### 2.1.2 Lược đồ bông tuyết
 
 
 
