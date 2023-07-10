@@ -16,6 +16,9 @@ I. [Kho dữ liệu và cách thức triển khai](#i-kho-dữ-liệu-và-cách-
 
     1.3 [Một số kiểu kho dữ liệu thường được áp dụng](#13-một-số-kiểu-kho-dữ-liệu-thường-được-áp-dụng)
 
+2.[Xây dựng mô hình kho dữ liệu](#2-xây-dựng-mô-hình-kho-dữ-liệu)
+
+
 [II. Bài toán phân tích dữ liệu hệ thống Multi-chain](#ii-bài-toán-phân-tích-dữ-liệu-hệ-thống-multi-chain)
 
 [III. Triển khai giải pháp và áp dụng](#iii-triển-khai-giải-pháp-và-áp-dụng)
@@ -58,7 +61,7 @@ Phụ thuộc vào bài toán cần giải quyết, kho dữ liệu cũng cần 
 
 **Data mart**: Giả sử như ta có một kho dữ liệu khổng lồ được mọi cá nhân trong tổ chức sử dụng. Người làm tiếp thị cần sử dụng dữ liệu để phân tích thì cần những dữ liệu liên quan đến khách hàng, sản phẩm, doanh thu,... để đưa ra những chiến lược phù hợp cho hoạt động kinh doanh. Trong khi đó, người làm quản lý nhân sự trong tổ chức thì cần sử dụng những dữ liệu về nhân sự, thành tích, khảo sát, chi phí, tuyển dụng,... để nắm rõ tình hình nội tại từ đó đưa ra những quyết định, chiến lược để cải thiện chất lượng nhân sự, văn hóa doanh nghiệp. Mỗi một vai trò công việc cần sử dụng những dữ liệu chủ đề khác nhau. Đáp ứng điều đó, data mart là một chiến lược áp dụng tốt khi sử dụng những kho dữ liệu nhỏ được phân loại theo hướng chủ đề như bán hàng, nhân sự, tài chính,... trong một tổ chức. Data mart thường được triển khai trên các máy chủ chi phí thấp dựa trên Unix/Linux hoặc Windows. Chu kỳ triển khai của một siêu thị dữ liệu có nhiều khả năng được đo bằng tuần hơn là tháng hoặc năm. Tuy nhiên, nó có thể liên quan đến sự tích hợp phức tạp trong thời gian dài nếu thiết kế và lập kế hoạch của nó không áp dụng cho toàn doanh nghiệp. Tùy thuộc vào nguồn dữ liệu, data mart có thể được thiết kế độc lập hay là phụ thuộc vào kho dữ liệu tổng của doanh nghiệp. Các data mart độc lập sẽ được cung cấp dữ liệu từ một hoặc nhiều hệ thống vận hành bên ngoài hoặc cục bộ trong một bộ phận cụ thể. Data mart phụ thuộc được coi là một thành phần con trong kho dữ liệu của doanh nghiệp.
 
-### 2. Mô hình xây dựng kho dữ liệu
+### 2. Xây dựng mô hình kho dữ liệu
 
 #### 2.1 Kĩ thuật mô hình hóa đa chiều
 
@@ -72,7 +75,7 @@ Mô hình dữ liệu đa chiều được triển khai trên các cơ sở dữ
 
 ![Lược đồ hình sao](./img/star-schema.png)
 
-Trên đây là một minh họa cho lược đồ hình sao với chủ điểm phân tích nằm ở bảng *fact_sale* chứa một lượng dữ liệu. Trong bảng, các trường gồm có các phép đo lường như *price*, *quantity* và các trường khóa ngoại liên kết với các bảng các thứ nguyên gồm *dim\_time*, *dim\_product*, *dim\_store*, *dim\_customer*, *dim\_sale\_type*.
+Ta lấy ví dụ về một lược đồ xây dựng kho dữ liệu đơn giản cho một công ty tên ABC với mong muốn phân tích được tình hình kinh doanh của trên toàn bộ chuỗi cửa hàng với lược đồ ở phía trên. Đây là một minh họa cho lược đồ hình sao với chủ điểm phân tích nằm ở bảng *fact_sale* chứa một lượng dữ liệu. Trong bảng, các trường gồm có các phép đo lường như *price*, *quantity* và các trường khóa ngoại liên kết với các bảng các thứ nguyên gồm *dim\_time*, *dim\_product*, *dim\_store*, *dim\_customer*, *dim\_sale\_type*.
 
 Như vậy ta thấy được rằng lược đồ hình sao là một lược đồ dễ dàng để triển khai và xây dựng. Quá trình trính xuất, biến đổi và tải (**ETL** - *Extract, Transform, Load*) được đơn giản hóa khi mà dữ liệu vừa được tải vào bảng fact và tải trực tiếp vào các bảng thứ nguyên dựa theo giá trị của các khóa ngoại. Không chỉ vậy, sử dụng lược đồ hình sao cũng tạo nên nhiều thuận tiện trong quá trình phân tích. Việc phân tích các chủ điểm phân tích ta sẽ sử dụng chủ yếu các phép JOIN và các toán tử tổng hợp như COUNT, SUM,... dựa theo một số phép đo đã được tính toán trong bảng fact. Người phân tích có thể thực hiện tốt các phân tích đi từ tổng quát đến chi tiết qua các phép truy vấn JOIN giữa bảng fact và các bảng dim khác nhau. Chẳng hạn với ví dụ lược đò ở trên, ngoài việc ta có thể biết được doanh thu của toàn bộ cửa hàng trong một quý là bao nhiêu:
 
@@ -106,9 +109,23 @@ Tuy nhiên, cũng vì sự đơn giản đó mà lược đồ hình sao không 
 
 ##### 2.1.2 Lược đồ bông tuyết
 
+Lược đồ bông tuyết là có ý tưởng giống như lược đồ hình sao nhưng có chút cải biên ở trong phần mở rộng cho các bảng thứ nguyên. Các bảng thứ nguyên (bảng dim) sẽ tiếp tục được chuẩn hóa và chia thành các bảng thứ nguyên con phân cấp. Tiếp tục lấy lại ví dụ trên với chủ điểm phân tích về doanh thu của công ty ABC, ta sẽ tiếp tục thực hiện chuẩn hóa ở một số bảng thứ nguyên như *dim_store*, *dim_product*:
 
+![Lược đồ bông tuyết](./img/snowflake.png)
 
-### 3. 
+Trên đây là ví dụ cho một cách chuẩn hóa lại lược đồ hình sao ở phía trên. Ngoài ra, lược đồ trên có thể tiếp tục chuẩn hóa tiếp ở bảng *dim_city*, *dim_time*,... tùy vào yêu cầu mức độ chuẩn hóa chi tiết đến đâu. Lược đồ bông tuyết đã phần nào giải quyết được sự dư thừa dữ liệu tồn tại trong lược đồ hình sao và nâng cao khả năng có thể mở rộng cho kho dữ liệu. Tuy nhiên, cấu trúc của lược đồ sẽ trở nên phức tạp hơn, dẫn đến các câu truy vấn trở nên cồng kềnh và phức tạp hơn để giải quyết câu hỏi so với lược đồ hình sao.
+
+##### 2.1.3 Lược đồ thiên hà
+
+Với các lược đồ phía trên, ta vẫn đang xét trường hợp sử dụng lược đò hình sao và bông tuyết gói gọn trong một chủ điểm phân tích. Tuy nhiên với một số trường hợp đặc biệt, các tổ chức doanh nghiệp cần để tâm tới nhiều hơn một chủ điểm phân tích (ví dụ như một cửa hàng ngoài việc đánh giá về tình hình kinh doanh trong thời gian qua còn muốn đánh giá thêm về các chi phí trong quá trình hoạt động,...). Nhu cầu đó đã nảy sinh thêm một lược đồ mới cũng với mô tuýp dim-fact nhưng có nhiều hơn một chủ điểm phân tích gọi là lược đồ hình sao (*galaxy-schema*). Đây là một lược đồ phức tạp và có phần linh hoạt hơn, bao gồm nhiều bảng chủ điểm phân tích dùng chung các bảng bảng thứ nguyên. Các bảng chủ điểm phân tích chứa các mức độ chi tiết khác nhau hoặc các quan điểm khác nhau của các dữ kiện. Ví dụ: một bảng thực tế có thể chứa dữ liệu bán hàng hàng ngày, trong khi một bảng thực tế khác có thể chứa dữ liệu hàng tồn kho hàng tháng. Các bảng thứ nguyên chứa các thuộc tính chung có thể được sử dụng để nối các bảng thực tế. Các mối quan hệ phức tạp trên lược đồ được giống như một chòm sao, với nhiều ngôi sao được kết nối bởi các bảng thứ nguyên được chia sẻ. Lược đồ thiên hà cho phép phân tích các sự kiện chi tiết và đa dạng hơn trên nhiều về mục tiêu lẫn điểm nhìn.
+
+![Lược đồ thiên hà](./img/fact_constellation.png)
+
+Lược đồ thiên hà cũng sẽ giúp kho dữ liệu đảm bảo tính toàn vẹn và giảm thiểu tính dư thừa dữ liệu giống như hai lược đồ ở trước. Tuy vậy, ta có thể thấy để truy vấn dữ liệu chuyên sâu trong lược đồ trên khá phức tạp, gây khó khăn trong việc tối ưu hóa truy vấn.
+
+#### 2.2 
+
+### 3. Các kiến trúc kho dữ liệu thường gặp
 
 ## II. Bài toán phân tích dữ liệu hệ thống Multi-chain
 
