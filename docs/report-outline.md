@@ -123,7 +123,9 @@ Với các lược đồ phía trên, ta vẫn đang xét trường hợp sử d
 
 Lược đồ thiên hà cũng sẽ giúp kho dữ liệu đảm bảo tính toàn vẹn và giảm thiểu tính dư thừa dữ liệu giống như hai lược đồ ở trước. Tuy vậy, ta có thể thấy để truy vấn dữ liệu chuyên sâu trong lược đồ trên khá phức tạp, gây khó khăn trong việc tối ưu hóa truy vấn.
 
-#### 2.2 
+#### 2.2 Các giai đoạn trong thiết kế lược đồ
+
+
 
 ### 3. Các kiến trúc kho dữ liệu thường gặp
 
@@ -135,4 +137,6 @@ Lược đồ thiên hà cũng sẽ giúp kho dữ liệu đảm bảo tính to�
 
 [Oracle, What is a data warehouse (oracle1)](https://www.oracle.com/database/what-is-a-data-warehouse/)
 
-[W. H. Inmon. Building the Data Warehouse. John Wiley & Sons, 1996 (inm96)]()
+[W. H. Inmon, Building the Data Warehouse, John Wiley & Sons, 1996 (inm96)]()
+
+[Ralph Kimball, Margy Ross, The Data Warehouse Toolkit, John Wiley & Sons, 3rd Edition, 2013]()
