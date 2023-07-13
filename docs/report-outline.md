@@ -27,6 +27,12 @@ I. [Kho dữ liệu và cách thức triển khai](#i-kho-dữ-liệu-và-cách-
 
 ## Tóm tắt đồ án
 
+### Danh mục viết tắt
+
+Operational Source System - OSS
+
+
+
 ## I. Kho dữ liệu và cách thức triển khai
 
 ### 1. Giới thiệu về kho dữ liệu
@@ -91,7 +97,9 @@ WHERE dt.quarter = 2
 ta còn có thể biết được thêm trong quý đó, cửa hàng nào ở thành phố *A* là có doanh số tốt nhất:
 
 ```sql
-SELECT ds.store_id AS store, SUM(quantity) AS quantities_in_quarter_2
+SELECT 
+    ds.store_id AS store, 
+    SUM(quantity) AS quantities_in_quarter_2
 FROM fact_sale fs
 JOIN dim_time dt
 ON fs.time_id = dt.time_id
@@ -123,11 +131,27 @@ Với các lược đồ phía trên, ta vẫn đang xét trường hợp sử d
 
 Lược đồ thiên hà cũng sẽ giúp kho dữ liệu đảm bảo tính toàn vẹn và giảm thiểu tính dư thừa dữ liệu giống như hai lược đồ ở trước. Tuy vậy, ta có thể thấy để truy vấn dữ liệu chuyên sâu trong lược đồ trên khá phức tạp, gây khó khăn trong việc tối ưu hóa truy vấn.
 
-#### 2.2 Các giai đoạn trong thiết kế lược đồ
+#### 2.2. Các kiến trúc vận hành kho dữ liệu thường gặp
+
+Sau khi đã phác thảo những ý tưởng trừu tượng, những thành phần tham gia với vai trò là điểm nhìn, là thước đo cho những chủ điểm phân tích trong kho dữ liệu, ta cần lựa chọn cho mình một kiến trúc kho dữ liệu phù hợp để xây dựng và triển khai. Ngày nay, các nhà phát triển đã đưa ra và triển khai nhiều ý tưởng đa dạng cho kiến trúc kho dữ liệu từ đơn giản đến phức hợp nhằm đáp ứng phù hợp với nhu cầu phân tích và sự phát triển của dữ liệu.
+
+#### 2.2.1 Kiến trúc Kimball
+
+Đây là kiến trúc được đặt theo tên của *Ralph Kimball* - người đầu tiên trên thế giới đề xuất và bàn những ý tưởng về kho dữ liệu và kinh doanh thông minh. Với tâm niệm rằng kho dữ liệu cần phải được xây dựng dễ hiểu và nhanh chóng, ông cho rằng trong một kho dữ liệu thì có sự tham gia của các thành phần sau: Các hệ thống thực thi xử lý giao dịch, hệ thống ETL, kho chứa dữ liệu và các ứng dụng người dùng cuối.
+
+![Các thành phần chính trong kiến trúc của Kimball](./img/kimball-archi.png)
+
+* **Các hệ thống thực thi xử lý giao dịch**: Việc để tách riêng các hệ thống thực thi xử lý giao dịch (*Operational Source System - OSS*) với kho dữ liệu ở đây với hàm ý rằng các dữ liệu trong OSS và kho dữ liệu là riêng biệt và kho dữ liệu không thể tác động. Bản thân nhiệm vụ của các OSS và kho dữ liệu là khác nhau - một bên luôn sẵn sàng và thực thiện giao dịch còn một bên là truy vấn dữ liệu lớn nên việc để riêng như vậy cũng góp phần duy trì được năng lực thực thi nhiệm vụ cho cho hai hệ thống. Kho dữ liệu sẽ lưu trữ toàn bộ các dữ liệu lịch sử thu được từ các hệ thống này và làm giàu dữ liệu theo thời gian, phục vụ cho nhu cầu phân tích chuyên sâu và chia sẻ dữ liệu cho các bên liên quan.
+
+* **Hệ thống ETL**: Hệ thống đóng vai trò quan trọng trong việc làm giàu kho dữ liệu khi đóng vai trò làm cầu nối giữa OSS và kho dữ liệu. Hệ thống ETL sẽ thực hiện các chức năng trích xuất, biến đổi và tải dữ liệu vào kho dữ liệu. Quá trình tải dữ liệu từ các OSS cần có thêm hai quá trình trích xuất và biến đổi thay vì tải trực tiếp. Lý do là bởi các cấu trúc dữ liệu, kiểu định dạng,... trong các OSS là khác với các yêu cầu trong kho dữ liệu, một phần vì nhiệm vụ của hai hệ thống này là khác nhau. Trích xuất (*Extract*) là quá trình hệ thống hiểu dữ liệu đầu vào và sao chép toàn bộ vào hệ thống ETL. Sau khi trích xuất, hệ thống thực hiện quá trình Biến đổi (*Transformation*) với mục đích chuẩn hóa dữ liệu, sẵn sàng cho việc tải dữ liệu (*Load*) vào kho dữ liệu.
+
+* 
 
 
 
-### 3. Các kiến trúc kho dữ liệu thường gặp
+### 3. Quá trình xây dựng và triển khai kho dữ liệu
+
+Sau những hiểu biết về kĩ thuật mô hình hóa đa chiều trong xây dựng kho dữ liệu, ta cần đưa ra những chiến lược cụ thể cho việc xây dựng kho dữ liệu. Quá trình thiết kế và xây dựng kho dữ liệu đóng vai trò quan trọng trong việc đưa những ý tưởng kinh doanh và nhu cầu phân tích trừu tượng vào trong thực tiễn. Để đảm bảo kho dữ liệu ta thiết kế đem lại hiệu quả tốt nhất, ta cần xác định rõ ràng những mục tiêu, các thức và các giai đoạn xây dựng cho kho dữ liệu.
 
 ## II. Bài toán phân tích dữ liệu hệ thống Multi-chain
 
@@ -139,4 +163,4 @@ Lược đồ thiên hà cũng sẽ giúp kho dữ liệu đảm bảo tính to�
 
 [W. H. Inmon, Building the Data Warehouse, John Wiley & Sons, 1996 (inm96)]()
 
-[Ralph Kimball, Margy Ross, The Data Warehouse Toolkit, John Wiley & Sons, 3rd Edition, 2013]()
+[Ralph Kimball, Margy Ross, The Data Warehouse Toolkit, John Wiley & Sons, 3rd Edition, 2013, ISBN: 978-1-118-53080-1]()
