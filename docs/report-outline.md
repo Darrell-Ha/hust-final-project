@@ -157,6 +157,63 @@ Sau những hiểu biết về kĩ thuật mô hình hóa đa chiều trong xây
 
 ## III. Triển khai giải pháp và áp dụng
 
+
+Quá trình tiến hành:
+Ở nguồn Moonbeans.io
+
+Lấy những thông tin về collection nft thông qua api: "https://api.moonbeans.io/collection"
+![test_collection_moonbeans_io](./img/chap3/test_collections_moonbeans_io_api.png)
+
+Thiết lập các hàm về quá trình extract
+```python
+def fetch(self):
+    link = "https://api.moonbeans.io/collection"
+    header = {
+        "Accept": "*/*"
+    }
+    r = requests.get(link, headers=header)
+    
+    return r.json()
+
+def extract(self):
+    fetch_data = self.fetch()
+    created_time = get_current_timestamp_utc()
+    collection_data = []
+    for record in fetch_data:
+        collection_data.append(
+            {
+                "contractAddress": record.get("contractAddress", "").lower(),
+                "links": json.dumps(record.get("links", {})),
+                "title": record.get("title"),
+                "headerSubtitle": record.get("headerSubtitle"),
+                "fullDescription": record.get("fullDescription"),
+                "startBlock": record.get("startBlock"),
+                "owner": record.get("owner"),
+                "status": record.get("status"),
+                "chain": record.get("chain"),
+                "enableMetaverse": record.get("enableMetaverse"),
+                "enableRarity": record.get("enableRarity"),
+                "enableBreeding": record.get("enableBreeding"),
+                "enableMint": record.get("enableMint"),
+                "enableAttributes": record.get("enableAttributes"),
+                "convertIPFS": record.get("convertIPFS"),
+                "maxSupply": record.get("maxSupply"),
+                "totalSupply": record.get("totalSupply"),
+                "mintCostText": record.get("mintCostText"),
+                "mintBeganText": record.get("mintBeganText"),
+                "is_archived": False,
+                "created_time": created_time,
+                "updated_time": created_time
+            }
+        )
+    
+    return collection_data
+```
+
+Thực hiện upsert vào bảng trong raw_area với task `extract_moonbeans_io_collection` trên airflow
+
+
+
 ## Tài liệu tham khảo
 
 [Oracle, What is a data warehouse (oracle1)](https://www.oracle.com/database/what-is-a-data-warehouse/)

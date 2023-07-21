@@ -245,7 +245,7 @@ services:
     volumes:
       - postgres-dw-volume:/var/lib/postgresql/data
     ports:
-      - "9105:5432"
+      - 9105:5432
     healthcheck:
       test: ["CMD", "pg_isready", "-U", "subwallet"]
       interval: 5s

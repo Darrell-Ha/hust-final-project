@@ -1,7 +1,12 @@
 import os
+import sys
 from dotenv import load_dotenv
 
 load_dotenv()
+
+PYTHONPATH = os.getenv("PYTHONPATH")
+if PYTHONPATH not in sys.path:
+    sys.path.insert(0, PYTHONPATH)
 
 DB_NAME = os.getenv('DB_NAME')
 DB_DW_NAME = os.getenv('DB_DW_NAME')
@@ -21,3 +26,5 @@ LOG_FILE = f"{LOG_NAME}.log"
 LOG_LEVEL = "DEBUG"
 LOG_FORMATTER = "[%(asctime)s] [%(name)s] [%(levelname)s] : %(message)s"
 
+DATETIME_FORMATTER = "%Y-%m-%d %H:%M:%S.%f"
+DATE_FORMATTER = "%Y-%m-%d"

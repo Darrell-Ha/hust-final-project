@@ -1,5 +1,6 @@
 import peewee
 from core.core import get_database
+from core.config import DATETIME_FORMATTER
 
 class MoonbeansTradeData(peewee.Model):
     tid = peewee.CharField(max_length=200, primary_key=True)
@@ -10,7 +11,7 @@ class MoonbeansTradeData(peewee.Model):
     seller = peewee.CharField(max_length=50, null=True)
     tx = peewee.CharField(max_length=66, null=True)
     value = peewee.FloatField()
-    timestamp = peewee.DateTimeField(formats='%Y-%m-%d %H:%M:%S.%f')
+    timestamp = peewee.DateTimeField(formats=DATETIME_FORMATTER)
 
     class Meta:
         database = get_database()
@@ -30,7 +31,7 @@ class MoonbeansCollectionData(peewee.Model):
     startBlock=peewee.IntegerField(null=True)
     owner=peewee.CharField(max_length=50, null=True)
     status=peewee.CharField(max_length=20, null=True)
-    chain=peewee.CharField(max_length=20, null=True)
+    chain=peewee.CharField(max_length=20)
     enableMetaverse=peewee.BooleanField(null=True)
     enableRarity=peewee.BooleanField(null=True)
     enableBreeding=peewee.BooleanField(null=True)
@@ -42,8 +43,8 @@ class MoonbeansCollectionData(peewee.Model):
     mintCostText=peewee.CharField(max_length=60, null=True)
     mintBeganText=peewee.CharField(max_length=60, null=True)
     is_archived=peewee.BooleanField()
-    created_time=peewee.DateTimeField(formats='%Y-%m-%d %H:%M:%S.%f')
-    updated_time=peewee.DateTimeField(formats='%Y-%m-%d %H:%M:%S.%f')
+    created_time=peewee.DateTimeField(formats=DATETIME_FORMATTER)
+    updated_time=peewee.DateTimeField(formats=DATETIME_FORMATTER)
 
     class Meta:
         database = get_database()

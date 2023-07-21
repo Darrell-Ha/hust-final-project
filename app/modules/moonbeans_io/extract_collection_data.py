@@ -1,15 +1,17 @@
 from core.base_extractor import BaseExtractor
 from core.core import get_logger
+from core.config import DATETIME_FORMATTER
 from .models import MoonbeansCollectionData
 
 import traceback
 import json
 import requests
 import datetime
+import peewee
 
 
 def get_current_timestamp_utc() -> str:
-    return datetime.datetime.now(datetime.timezone.utc).strftime('%Y-%m-%d %H:%M:%S.%f')
+    return datetime.datetime.now(datetime.timezone.utc).strftime(DATETIME_FORMATTER)
 
 class NftCollectionDataExtractor(BaseExtractor):
 
@@ -18,12 +20,13 @@ class NftCollectionDataExtractor(BaseExtractor):
         header = {
             "Accept": "*/*"
         }
-        r = requests.get(link,  headers=header)
+        r = requests.get(link, headers=header)
         
         return r.json()
 
     def extract(self):
         fetch_data = self.fetch()
+        created_time = get_current_timestamp_utc()
         collection_data = []
         for record in fetch_data:
             collection_data.append(
@@ -46,7 +49,10 @@ class NftCollectionDataExtractor(BaseExtractor):
                     "maxSupply": record.get("maxSupply"),
                     "totalSupply": record.get("totalSupply"),
                     "mintCostText": record.get("mintCostText"),
-                    "mintBeganText": record.get("mintBeganText")
+                    "mintBeganText": record.get("mintBeganText"),
+                    "is_archived": False,
+                    "created_time": created_time,
+                    "updated_time": created_time
                 }
             )
         
@@ -61,61 +67,34 @@ class NftCollectionDataExtractor(BaseExtractor):
             get_logger().error(e)
             traceback.print_exc()
 
-    def insert(self, record: dict):
-        get_logger().debug("insert " + json.dumps(record))
+    def bulk_upsert(self, records: list[dict]):
+        get_logger().debug(f"upsert {len(records)} records")
         try:
-            created_time = get_current_timestamp_utc()
-            MoonbeansCollectionData.create(
-                contractAddress=record.get("contractAddress"),
-                links=record.get("links"),
-                title=record.get("title"),
-                headerSubtitle=record.get("headerSubtitle"),
-                fullDescription=record.get("fullDescription"),
-                startBlock=record.get("startBlock"),
-                owner=record.get("owner"),
-                status=record.get("status"),
-                chain=record.get("chain"),
-                enableMetaverse=record.get("enableMetaverse"),
-                enableRarity=record.get("enableRarity"),
-                enableBreeding=record.get("enableBreeding"),
-                enableMint=record.get("enableMint"),
-                enableAttributes=record.get("enableAttributes"),
-                convertIPFS=record.get("convertIPFS"),
-                maxSupply=record.get("maxSupply"),
-                totalSupply=record.get("totalSupply"),
-                mintCostText=record.get("mintCostText"),
-                mintBeganText=record.get("mintBeganText"),
-                is_archived=False,
-                created_time=created_time,
-                updated_time=created_time
-            )
+            query = MoonbeansCollectionData.insert_many(records)
+            query = query.on_conflict(
+                        conflict_target=[MoonbeansCollectionData.contractAddress, MoonbeansCollectionData.chain],
+                        update={
+                            "links": peewee.EXCLUDED.links,
+                            "title": peewee.EXCLUDED.title,
+                            "headerSubtitle": peewee.EXCLUDED.headerSubtitle,
+                            "fullDescription": peewee.EXCLUDED.fullDescription,
+                            "startBlock": peewee.EXCLUDED.startBlock,
+                            "owner": peewee.EXCLUDED.owner,
+                            "status": peewee.EXCLUDED.status,
+                            "enableMetaverse": peewee.EXCLUDED.enableMetaverse,
+                            "enableRarity": peewee.EXCLUDED.enableRarity,
+                            "enableBreeding": peewee.EXCLUDED.enableBreeding,
+                            "enableMint": peewee.EXCLUDED.enableMint,
+                            "enableAttributes": peewee.EXCLUDED.enableAttributes,
+                            "convertIPFS": peewee.EXCLUDED.convertIPFS,
+                            "maxSupply": peewee.EXCLUDED.maxSupply,
+                            "totalSupply": peewee.EXCLUDED.totalSupply,
+                            "mintCostText": peewee.EXCLUDED.mintCostText,
+                            "mintBeganText": peewee.EXCLUDED.mintBeganText,
+                            "updated_time": peewee.EXCLUDED.updated_time
+                        })
+            query.execute()
         except Exception as e:
             get_logger().error(e)
             traceback.print_exc()
 
-    def update(self, record: dict):
-        get_logger().debug("update " + json.dumps(record))
-        comming_address = record.get("contractAddress")
-        record.update(
-            {"updated_time": get_current_timestamp_utc()})
-        try:
-            update_query = MoonbeansCollectionData\
-                .update(record)\
-                .where(MoonbeansCollectionData.contractAddress == comming_address)
-            update_query.execute()
-        except Exception as e:
-            get_logger().error(e)
-            traceback.print_exc()
-
-
-    def exist(self, record: dict) -> bool:
-        record_exists = False
-        comming_address = record.get("contractAddress", None)
-        if comming_address:
-            record_exists = MoonbeansCollectionData\
-                .select("contractAddress")\
-                .where(MoonbeansCollectionData.contractAddress == comming_address)\
-                .exists()
-        else:
-            raise ValueError("contractAddress is empty!!")
-        return record_exists
