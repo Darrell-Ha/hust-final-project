@@ -40,6 +40,8 @@ version: '3.8'
 x-airflow-common:
   &airflow-common
   image: ${AIRFLOW_IMAGE_NAME:-final_thesis/dw:latest}
+  build:
+    dockerfile: Dockerfile
   environment:
     &airflow-common-env
     AIRFLOW__CORE__EXECUTOR: CeleryExecutor
