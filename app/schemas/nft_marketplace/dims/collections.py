@@ -21,6 +21,4 @@ class DimCollections(peewee.Model):
             (("contract_address",), True),
         )
 
-
-
     

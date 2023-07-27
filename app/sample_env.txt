@@ -1,0 +1,8 @@
+DB_NAME = "raw_area"
+DB_DW_NAME = "dw_area"
+DB_HOST = "localhost"
+DB_PORT = 9015
+DB_USER = "hadat"
+DB_PASSWORD = "hadat"
+LOG_NAME = "final_dw"
+SUBSCAN_API_KEY = "api-key-subscan"

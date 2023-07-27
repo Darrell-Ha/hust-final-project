@@ -6,7 +6,7 @@ class DimChain(peewee.Model):
 
     chain_slug=peewee.CharField(max_length=30, primary_key=True)
     relay_chain=peewee.CharField(max_length=20)
-    unit=peewee.CharField(max_length=10)
+    unit=peewee.CharField(max_length=10, null=True)
     
 
     class Meta:
@@ -16,7 +16,5 @@ class DimChain(peewee.Model):
         indexes = (
             (("chain_slug",), True),
         )
-
-
 
     

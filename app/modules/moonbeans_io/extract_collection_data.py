@@ -55,7 +55,7 @@ class NftCollectionDataExtractor(BaseExtractor):
                     "updated_time": created_time
                 }
             )
-        
+        get_logger().debug(f"extracted: {len(fetch_data)} records")
         return collection_data
 
     def init_table(self):
@@ -68,7 +68,6 @@ class NftCollectionDataExtractor(BaseExtractor):
             traceback.print_exc()
 
     def bulk_upsert(self, records: list[dict]):
-        get_logger().debug(f"upsert {len(records)} records")
         try:
             query = MoonbeansCollectionData.insert_many(records)
             query = query.on_conflict(
@@ -94,6 +93,7 @@ class NftCollectionDataExtractor(BaseExtractor):
                             "updated_time": peewee.EXCLUDED.updated_time
                         })
             query.execute()
+            get_logger().debug(f"upsert: {len(records)} records")
         except Exception as e:
             get_logger().error(e)
             traceback.print_exc()

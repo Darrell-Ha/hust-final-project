@@ -4,9 +4,9 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-PYTHONPATH = os.getenv("PYTHONPATH")
-if PYTHONPATH not in sys.path:
-    sys.path.insert(0, PYTHONPATH)
+# PYTHONPATH = os.getenv("PYTHONPATH")
+# if PYTHONPATH not in sys.path:
+#     sys.path.insert(0, PYTHONPATH)
 
 DB_NAME = os.getenv('DB_NAME')
 DB_DW_NAME = os.getenv('DB_DW_NAME')

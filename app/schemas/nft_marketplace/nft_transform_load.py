@@ -1,41 +1,51 @@
-from .dims.buyers import DimBuyers
-from .dims.sellers import DimSellers
+from .dims.account import DimAccount
 from .dims.date import DimDate
 from .dims.collections import DimCollections
 from .dims.chain import DimChain
 from .facts.activities import FactActivities
 
-# from .models import TradeData
-from modules.subscan.daily.models import NetworkDailyData
+from modules.santiment.models import SantimentPriceChain
 from core.base_transform_load import BaseTransformLoad
 from core.core import get_logger
-from abc import abstractmethod
+from core.config import DATETIME_FORMATTER
 import pandas as pd
 import json
 import datetime
 import traceback
+import peewee
 
-def get_data_price(start_date: datetime.datetime=datetime.datetime.now()-datetime.timedelta(days=1), 
-                    end_date: datetime.datetime=datetime.datetime.now()):
-    return [inst.__dict__.get("__data__") for inst in NetworkDailyData\
-            .select(
-                NetworkDailyData.time_utc,
-                NetworkDailyData.network, 
-                NetworkDailyData.unit_usd,
-                NetworkDailyData.unit
-            ).where(
-                NetworkDailyData.time_utc.between(start_date, end_date)
-            )]
 
 
 class NftTransformer(BaseTransformLoad):
+    
+    # START_TIME = datetime.datetime.now()-datetime.timedelta(days=2)
+    START_TIME = datetime.datetime(2022, 1, 18)
+    # END_TIME = datetime.datetime.now()
+    END_TIME = datetime.datetime.now()
+    FORMAT_TIME_MAPPING = "%Y-%m-%d %H"
+
+    def get_data_price(self, chains: list):
+        df = pd.DataFrame(
+            SantimentPriceChain\
+                .select(
+                    SantimentPriceChain.time,
+                    SantimentPriceChain.price_usd,
+                    SantimentPriceChain.chain
+                )\
+                .where(
+                    SantimentPriceChain.time.between(self.START_TIME, self.END_TIME)\
+                    & SantimentPriceChain.chain.in_(chains)  
+                )\
+                .dicts()
+        )
+        df['time_price_mapping'] = df['time'].dt.strftime(self.FORMAT_TIME_MAPPING)
+        df = df.rename(columns={"price_usd": "unit_usd"})
+        return df
 
     def init_table(self):
         try:
-            if not DimBuyers.table_exists():
-                DimBuyers.create_table(safe=True)
-            if not DimSellers.table_exists():
-                DimSellers.create_table(safe=True)
+            if not DimAccount.table_exists():
+                DimAccount.create_table(safe=True)
             if not DimDate.table_exists():
                 DimDate.create_table(safe=True)
             if not DimChain.table_exists():
@@ -48,195 +58,134 @@ class NftTransformer(BaseTransformLoad):
             get_logger().error(e)
             traceback.print_exc()
 
-    @abstractmethod
-    def transform(self):
-        data_raw = [inst.__dict__.get("__data__") for inst in self.model.select()]
-        # df = pd.DataFrame
-        if data_raw != []:
-            df = pd.DataFrame(data_raw)
-            df['time_utc'] = df['created_at'].dt.strftime("%Y-%m-%d")
-            start_date = df['time_utc'].min()
-            end_date = df['time_utc'].max()
-            df_price = pd.DataFrame(get_data_price(start_date=start_date, end_date=end_date))
-            df_price['time_utc'] = df_price['time_utc'].dt.strftime("%Y-%m-%d")
-            merged_info = df.merge(df_price, on=['network', 'time_utc'], how='left')
-            merged_info['usd_value'] = merged_info['unit_usd'] * merged_info['price']
-            records = json.loads(merged_info.to_json(orient="records"))
-            transformed_record = []
-            for record in records:
-                transformed_record.append(
-                    {
-                        "timestamp": record.get("created_at", 0),
-                        "contract_address": record.get("nft_contract"),
-                        "contract_name": record.get("contract_name"),
-                        "descriptions": record.get("nft_description"),
-                        "owner_address": record.get("owner"),
-                        "buyer_address": record.get("to_address"),
-                        "buyer_name": record.get("to_user_nickname"),
-                        "seller_address": record.get("from_address"),
-                        "seller_name": record.get("from_user_nickname"),
-                        "chain_slug": record.get("network"),
-                        "type_activities": record.get("category"),
-                        "token_id": record.get("token_id"),
-                        "value": record.get("price"),
-                        "unit": record.get("unit"),
-                        "unit_usd": record.get("unit_usd"),
-                        "usd_value": record.get("usd_value"),
-                        "source_record": "tofunft",
-                        "tx": record.get("tx")
-                    }
-                )
-            
-        return transformed_record
-
-    def load(self, record: dict):
-        self.load_to_date(record)
-        self.load_to_seller(record)
-        self.load_to_buyer(record)
-        self.load_to_chain(record)
-        self.load_to_collection(record)
-        self.load_to_activities(record)
+    def transform(self) -> pd.DataFrame:
         pass
 
-    def load_to_date(self, record: dict):
-        record_time = record.get("timestamp")
-        if not DimDate.select("date_id").where(DimDate.date_id == record_time).exists():
-            get_logger().debug("load datetime " + str(record_time))
-            date_processing = datetime.datetime.fromtimestamp(record_time / 1e3)
-            DimDate.create(
-                date_id=record_time,
-                date_actual=date_processing.strftime("%Y-%m-%d %H:%M:%S.%f"),
-                day_of_week=date_processing.weekday() + 2,
-                day_of_month=date_processing.day,
-                month=date_processing.month,
-                quarter=(date_processing.month - 1) // 3 + 1,
-                year=date_processing.year
-            )
-    
-    def load_to_seller(self, record):
-        seller_address = record.get("seller_address")
-        name = record.get("seller_name")
-        if seller_address:
-            if not DimSellers.select("seller_address").where(DimSellers.seller_address == seller_address).exists():
-                get_logger().debug("load seller: " + seller_address)
-                DimSellers.create(
-                    seller_address=seller_address,
-                    name=name
-                )
-    
-    def load_to_buyer(self, record):
-        buyer_address = record.get("buyer_address")
-        name = record.get("buyer_name")
-        if buyer_address:
-            if not DimBuyers.select("buyer_address").where(DimBuyers.buyer_address == buyer_address).exists():
-                get_logger().debug("load buyer: " + buyer_address)
-                DimBuyers.create(
-                    buyer_address=buyer_address,
-                    name=name
-                )
+    def bulk_load(self, records: pd.DataFrame):
+        records = records.sort_values('date_id', ascending=False)
+        self.load_to_date(records[['date_id']])
+        self.load_to_account(records[['seller_address', 'seller_name']])
+        self.load_to_account(records[['buyer_address', 'buyer_name']])
+        self.load_to_chain(records[['chain_slug']])
+        self.load_to_collection(records[['contract_address', 'contract_name', 'descriptions',\
+                                         'owner_address',  'owner_name', 'link', 'max_supply', 'total_supply']])
+        self.load_to_activities(records[["date_id", "contract_address", "buyer_address", "seller_address",\
+                                        "chain_slug", "type_activities", "token_id", "value", "unit_usd",\
+                                        "usd_value", "source_record", "tx"]])
+        pass
 
-    def load_to_chain(self, record):
-        chain_slug = record.get("chain_slug")
-        unit = record.get("unit")
-        if chain_slug in {"moonbeam", "astar"}:
-            relay_chain = "polkadot"
-        elif chain_slug in {"shiden", "moonriver"}:
-            relay_chain = "kusama"
-        if DimChain.select("chain_slug").where(DimChain.chain_slug == chain_slug).exists():
-            pass
-        else:
-            get_logger().debug("load chain: " + chain_slug)
-            DimChain.create(
-                chain_slug=chain_slug,
-                relay_chain=relay_chain,
-                unit=unit
-            )
-    
-    @abstractmethod
-    def load_to_collection(self, record):
-        contract_address = record.get("contract_address")
-        contract_name = record.get("contract_name")
-        descriptions = record.get("descriptions")
-        owner_address = record.get("owner_address")
-        owner_name = record.get("owner_name")
-        link = record.get("link")
-        max_supply = record.get("max_supply")
-        total_supply = record.get("total_supply")
+    def load_to_date(self, date_ids: pd.DataFrame):
+        process_time = date_ids.drop_duplicates().copy()
+        process_time['date_actual'] = pd.to_datetime(process_time['date_id']).dt.strftime(DATETIME_FORMATTER)
+        process_time['day_of_week'] = process_time['date_id'].dt.day_of_week + 2
+        process_time['day_of_month'] = process_time['date_id'].dt.day
+        process_time['month'] = process_time['date_id'].dt.month
+        process_time['quarter'] = (process_time['month'] - 1) // 3 + 1 
+        process_time['year'] = process_time['date_id'].dt.year
+        records = json.loads(process_time.to_json(orient='records'))
+        try:
+            query = DimDate.insert_many(records)
+            query = query.on_conflict(conflict_target=[DimDate.date_id,], update={
+                "date_actual": peewee.EXCLUDED.date_actual,
+                "day_of_week": peewee.EXCLUDED.day_of_week,
+                "day_of_month": peewee.EXCLUDED.day_of_month,
+                "month": peewee.EXCLUDED.month,
+                "quarter": peewee.EXCLUDED.quarter,
+                "year": peewee.EXCLUDED.year,
+            })
+            query.execute()
+            get_logger().debug(f"load_date: upsert {len(records)}")
+        except Exception as e:
+            get_logger().error(e)
+            traceback.print_exc()
 
-        if not DimCollections.select("contract_address").where(DimCollections.contract_address == contract_address).exists():
-            get_logger().debug("load collection: " + contract_address)
-            DimCollections.create(
-                contract_address=contract_address,
-                contract_name=contract_name,
-                descriptions=descriptions,
-                owner_address=owner_address,
-                owner_name=owner_name,
-                link=link,
-                max_supply=max_supply,
-                total_supply=total_supply
-            )
     
-    def load_to_activities(self, record):
-        
-        date_id = record.get("timestamp")
-        contract_address = record.get("contract_address")
-        buyer_address = record.get("buyer_address")
-        seller_address = record.get("seller_address")
-        chain_slug = record.get("chain_slug")
-        
-        if FactActivities\
-            .select()\
-            .where(
-                FactActivities.date_id == date_id,
-                FactActivities.contract_address == contract_address,
-                FactActivities.buyer_address == buyer_address,
-                FactActivities.seller_address == seller_address,
-                FactActivities.chain_slug == chain_slug
-            ).exists():
-            pass
-            # get_logger().debug("update activities: " + str(date_id))
-            # update_query = FactActivities.update(
-            #     {
-            #         "date_id":date_id,
-            #         "contract_address":contract_address,
-            #         "buyer_address":buyer_address,
-            #         "seller_address":seller_address,
-            #         "chain_slug":chain_slug,
-            #         "type_activities":record.get("type_activities"),
-            #         "token_id":record.get("token_id"),
-            #         "value":record.get("value"),
-            #         "unit":record.get("unit"),
-            #         "unit_usd":record.get("unit_usd"),
-            #         "usd_value":record.get("usd_value"),
-            #         "source_record":record.get("source_record"),
-            #         "tx":record.get("tx")
-            #     }
-            # ).where(
-            #     FactActivities.date_id == date_id,
-            #     FactActivities.contract_address == contract_address,
-            #     FactActivities.buyer_address == buyer_address,
-            #     FactActivities.seller_address == seller_address,
-            #     FactActivities.chain_slug == chain_slug
-            # )
-            # update_query.execute()
-        
-        else:
-            get_logger().debug("load activities: " + str(date_id))
-            FactActivities.create(
-                date_id=date_id,
-                contract_address=contract_address,
-                buyer_address=buyer_address,
-                seller_address=seller_address,
-                chain_slug=chain_slug,
-                type_activities=record.get("type_activities"),
-                token_id=record.get("token_id"),
-                value=record.get("value"),
-                # unit=record.get("unit"),
-                unit_usd=record.get("unit_usd"),
-                usd_value=record.get("usd_value"),
-                source_record=record.get("source_record"),
-                tx=record.get("tx")
+    def load_to_account(self, accounts: pd.DataFrame):
+        process_accs = accounts.drop_duplicates().copy()
+        process_accs.columns = [
+            *map(
+                lambda col: "address" if "address" in col else "name",
+                process_accs.columns
             )
+        ]
+        process_accs = process_accs.dropna(subset=['address'])
+        process_accs = process_accs.drop_duplicates(subset=['address'], keep='first')
+        records = json.loads(process_accs.to_json(orient='records'))
+        try:
+            query = DimAccount.insert_many(records)
+            query = query.on_conflict(conflict_target=[DimAccount.address,], update={
+                "name": peewee.EXCLUDED.name,
+            })
+            query.execute()
+            get_logger().debug(f"load_account: upsert {len(records)}")
+        except Exception as e:
+            get_logger().error(e)
+            traceback.print_exc()
+
+    def load_to_chain(self, chain_infos: pd.DataFrame):
+        polkadot_parachains = {"moonbeam", "astar"}
+        kusama_parachains = {"shiden", "moonriver"}
+        process_info = chain_infos.drop_duplicates().copy()
+        process_info.loc[process_info['chain_slug'].isin(polkadot_parachains), 'relay_chain'] = 'polkadot'
+        process_info.loc[process_info['chain_slug'].isin(kusama_parachains), 'relay_chain'] = 'kusama'
+        records = json.loads(process_info.to_json(orient='records'))
+        try:
+            query = DimChain.insert_many(records)
+            query = query.on_conflict(conflict_target=[DimChain.chain_slug,], update={
+                "relay_chain": peewee.EXCLUDED.relay_chain,
+            })
+            query.execute()
+            get_logger().debug(f"load_chain: upsert {len(records)}")
+        except Exception as e:
+            get_logger().error(e)
+            traceback.print_exc()
+
+    def load_to_collection(self, collections: pd.DataFrame):
+        process_info = collections.drop_duplicates().copy()
+        records = json.loads(process_info.to_json(orient='records'))
+        try:
+            query = DimCollections.insert_many(records)
+            query = query.on_conflict(conflict_target=[DimCollections.contract_address,], update={
+                "contract_name": peewee.EXCLUDED.contract_name,
+                "descriptions": peewee.EXCLUDED.descriptions,
+                "owner_address": peewee.EXCLUDED.owner_address,
+                "owner_name": peewee.EXCLUDED.owner_name,
+                "link": peewee.EXCLUDED.link,
+                "max_supply": peewee.EXCLUDED.max_supply,
+                "total_supply": peewee.EXCLUDED.total_supply
+            })
+            query.execute()
+            get_logger().debug(f"load_collections: upsert {len(records)}")
+        except Exception as e:
+            get_logger().error(e)
+            traceback.print_exc()
+
+    def load_to_activities(self, records: pd.DataFrame):
+        process_records = json.loads(records.to_json(orient='records'))
+        try:
+            query = FactActivities.insert_many(process_records)
+            query = query.on_conflict(
+                conflict_target=[
+                    FactActivities.date_id,
+                    FactActivities.contract_address,
+                    FactActivities.buyer_address,
+                    FactActivities.seller_address,
+                    FactActivities.chain_slug,],
+                update={
+                    "type_activities": peewee.EXCLUDED.type_activities,
+                    "token_id": peewee.EXCLUDED.token_id,
+                    "value": peewee.EXCLUDED.value,
+                    "unit_usd": peewee.EXCLUDED.unit_usd,
+                    "usd_value": peewee.EXCLUDED.usd_value,
+                    "source_record": peewee.EXCLUDED.source_record,
+                    "tx": peewee.EXCLUDED.tx
+                })
+            query.execute()
+            get_logger().debug(f"load_activities: upsert {len(process_records)}")
+        except Exception as e:
+            get_logger().error(e)
+            traceback.print_exc()
+    
 
 
 

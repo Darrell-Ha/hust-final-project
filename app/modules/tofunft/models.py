@@ -1,7 +1,7 @@
 import peewee
 from core.core import get_database
 
-class TradeData(peewee.Model):
+class TofuTradeData(peewee.Model):
     
     id_rec=peewee.IntegerField(primary_key=True, null=False)
     tx=peewee.CharField(max_length=80, null=True)
@@ -24,8 +24,4 @@ class TradeData(peewee.Model):
     class Meta:
         database = get_database()
         table_name = "tofunft_trade_data"
-        indexes = (
-            (("id_rec",), True),
-        )
-        order_by = ('-created_at',)
 

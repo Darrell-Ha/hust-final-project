@@ -247,7 +247,7 @@ services:
     ports:
       - 9105:5432
     healthcheck:
-      test: ["CMD", "pg_isready", "-U", "subwallet"]
+      test: ["CMD", "pg_isready", "-U", "hadat"]
       interval: 5s
       retries: 5
     restart: always

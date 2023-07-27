@@ -5,7 +5,7 @@ from core.config import DATETIME_FORMATTER
 class MoonbeansTradeData(peewee.Model):
     tid = peewee.CharField(max_length=200, primary_key=True)
     ttype = peewee.CharField(max_length=10, null=True)
-    collectionId = peewee.CharField(max_length=50)
+    contractAddress = peewee.CharField(max_length=50)
     tokenId = peewee.IntegerField()
     buyer = peewee.CharField(max_length=50)
     seller = peewee.CharField(max_length=50, null=True)
@@ -16,14 +16,13 @@ class MoonbeansTradeData(peewee.Model):
     class Meta:
         database = get_database()
         table_name = "moonbeans_trade_data"
-        indexes = (
-            (("tid",), True),
-        )
+
 
 
 class MoonbeansCollectionData(peewee.Model):
 
     contractAddress=peewee.CharField(max_length=50, primary_key=True)
+    chain=peewee.CharField(max_length=20)
     links=peewee.CharField(max_length=1000, null=True)
     title=peewee.CharField(max_length=100, null=True)
     headerSubtitle=peewee.CharField(max_length=500, null=True)
@@ -31,7 +30,6 @@ class MoonbeansCollectionData(peewee.Model):
     startBlock=peewee.IntegerField(null=True)
     owner=peewee.CharField(max_length=50, null=True)
     status=peewee.CharField(max_length=20, null=True)
-    chain=peewee.CharField(max_length=20)
     enableMetaverse=peewee.BooleanField(null=True)
     enableRarity=peewee.BooleanField(null=True)
     enableBreeding=peewee.BooleanField(null=True)
@@ -50,5 +48,5 @@ class MoonbeansCollectionData(peewee.Model):
         database = get_database()
         table_name = "moonbeans_collection_data"
         indexes = (
-            (("contractAddress", "chain"), True),
+            (("chain", "contractAddress"), True),
         )

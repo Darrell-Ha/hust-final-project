@@ -212,6 +212,10 @@ def extract(self):
 
 Thực hiện upsert vào bảng trong raw_area với task `extract_moonbeans_io_collection` trên airflow
 
+![success_collection_moonbeans](./img/chap3/collection_moonbeans_success.png)
+![success_collection_moonbeans_db](./img/chap3/moonbeans_collections.png)
+
+Tiếp tục thực hiện lấy các giao dịch trên chợ thông qua API: https://graphql.moonbeans.io/graphql
 
 
 ## Tài liệu tham khảo

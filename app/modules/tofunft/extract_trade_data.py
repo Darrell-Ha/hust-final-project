@@ -1,19 +1,19 @@
 from core.base_extractor import BaseExtractor
 from core.core import get_logger
-from .models import TradeData
+from .models import TofuTradeData
 
 from bs4 import BeautifulSoup
 import traceback
 import json
 import datetime
 import urllib.request as url_req
+import peewee
 
 
 class TofuNftDataExtractor(BaseExtractor):
 
     network = {"shiden": 336, "astar": 592,
                "moonbeam": 1284}
-            #    "moonbeam": 1284, "moonriver": 1285}
 
     def fetch(self, network: str,
               start_time: datetime.datetime = datetime.datetime.now() - datetime.timedelta(days=1),
@@ -103,8 +103,37 @@ class TofuNftDataExtractor(BaseExtractor):
     def init_table(self):
         ## Create table if not exists
         try:
-            if not TradeData.table_exists():
-                TradeData.create_table(safe=True)
+            if not TofuTradeData.table_exists():
+                TofuTradeData.create_table(safe=True)
+        except Exception as e:
+            get_logger().error(e)
+            traceback.print_exc()
+
+    def bulk_upsert(self, records: list[dict]):
+        try:
+            query = TofuTradeData.insert_many(records)
+            query = query.on_conflict(
+                        conflict_target=[TofuTradeData.id_rec,],
+                        update={
+                            "tx": peewee.EXCLUDED.tx,
+                            "category": peewee.EXCLUDED.category,
+                            "type_tx": peewee.EXCLUDED.type_tx,
+                            "price": peewee.EXCLUDED.price,
+                            "to_user_nickname": peewee.EXCLUDED.to_user_nickname,
+                            "to_address": peewee.EXCLUDED.to_address,
+                            "from_user_nickname": peewee.EXCLUDED.from_user_nickname,
+                            "from_address": peewee.EXCLUDED.from_address,
+                            "nft_name": peewee.EXCLUDED.nft_name,
+                            "nft_description": peewee.EXCLUDED.nft_description,
+                            "token_id": peewee.EXCLUDED.token_id,
+                            "nft_contract": peewee.EXCLUDED.nft_contract,
+                            "contract_name": peewee.EXCLUDED.contract_name,
+                            "owner": peewee.EXCLUDED.owner,
+                            "created_at": peewee.EXCLUDED.created_at,
+                            "network": peewee.EXCLUDED.network
+                        })
+            query.execute()
+            get_logger().debug(f"upsert {len(records)} records")
         except Exception as e:
             get_logger().error(e)
             traceback.print_exc()
@@ -112,7 +141,7 @@ class TofuNftDataExtractor(BaseExtractor):
     def insert(self, record: dict):
         get_logger().debug("insert " + json.dumps(record))
         try:
-            TradeData.create(
+            TofuTradeData.create(
                 id_rec=record.get("id_rec"),
                 tx=record.get("tx"),
                 category=record.get("category"),
@@ -139,9 +168,9 @@ class TofuNftDataExtractor(BaseExtractor):
         get_logger().debug("update " + json.dumps(record))
         id_rec = record.get("id_rec")
         try:
-            update_query = TradeData\
+            update_query = TofuTradeData\
                 .update(record)\
-                .where(TradeData.id_rec == id_rec)
+                .where(TofuTradeData.id_rec == id_rec)
             update_query.execute()
         except Exception as e:
             get_logger().error(e)
@@ -151,9 +180,9 @@ class TofuNftDataExtractor(BaseExtractor):
         record_exists = False
         id_rec = record.get("id_rec", None)
         if id_rec:
-            record_exists = TradeData\
+            record_exists = TofuTradeData\
                 .select("id_rec")\
-                .where(TradeData.id_rec == id_rec)\
+                .where(TofuTradeData.id_rec == id_rec)\
                 .exists()
         else:
             raise ValueError("id_rec is empty!!")

@@ -20,7 +20,7 @@ class BaseTransformLoad:
         pass
 
     @abstractmethod
-    def load(self, record):
+    def bulk_load(self, records: list[dict]):
         pass
 
     @abstractmethod
@@ -35,7 +35,7 @@ class BaseTransformLoad:
             BaseTransformLoad.is_processing = True
             self.init_table()
             frame = self.transform()
-            offset = 1e4
+            offset = int(1e5)
             for pointer in range(0, len(frame), offset):
                 self.bulk_load(frame.loc[pointer: pointer + offset])
 

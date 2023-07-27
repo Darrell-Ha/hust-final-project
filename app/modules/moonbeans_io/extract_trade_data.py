@@ -1,18 +1,19 @@
 from core.base_extractor import BaseExtractor
 from core.core import get_logger
+from core.config import DATETIME_FORMATTER
 from .models import MoonbeansTradeData, MoonbeansCollectionData
 from modules.subscan.api import getinfo
 
 import datetime
 import traceback
-import json
 import requests
+import peewee
 
 
 def standard_address(ca: str):
     return ca.lower()
 
-def extract_more_in_subscan(record: dict):
+def extract_seller_from_subscan(record: dict):
     tid = record.get("id")
     contractAddress = standard_address(record.get("collectionId"))
     collection_record = (MoonbeansCollectionData\
@@ -40,24 +41,38 @@ def extract_more_in_subscan(record: dict):
 class MoonbeansTradeDataExtractor(BaseExtractor):
 
     def fetch(self,
-              start_time = datetime.datetime.now() - datetime.timedelta(days=1),
+              start_time = datetime.datetime.now() - datetime.timedelta(days=7),
               end_time = datetime.datetime.now()):
             #   start_time = datetime.datetime(2021, 10, 1),
-            #   end_time = datetime.datetime(2021, 12, 1)):
+            #   end_time = datetime.datetime(2023, 10, 1)):
         link = "https://graphql.moonbeans.io/graphql"
         header = {
             "Accept": "*/*",
             "Content-Type": "application/json"
         }
-        payload = "{\"query\":\"query ALL_TRADES {   allFills(first: 1000, orderBy: TIMESTAMP_DESC) {     nodes {       type       buyer       id       timestamp       value       collectionId       __typename     }     __typename   } }\",\"variables\":\"{}\"}"
-        # payload = "{\"query\":\"query ALL_TRADES {   allFills(orderBy: TIMESTAMP_DESC) {     nodes {       type       buyer       id       timestamp       value       collectionId       __typename     }     __typename   } }\",\"variables\":\"{}\"}"
-        r = requests.post(link, data=payload,  headers=header)
+        payload = """
+            query ALL_TRADES{
+                allFills(
+                    first: 1000,
+                    orderBy: TIMESTAMP_DESC
+                ){
+                    nodes{
+                        id
+                        buyer
+                        timestamp
+                        value
+                        collectionId
+                    }
+                }
+            }
+        """
+        r = requests.post(link, json={"query": payload,},  headers=header)
         raw_res = r.json().get('data', {}).get('allFills', {}).get('nodes', [])
         fetch_data = []
         for record in raw_res:
             record_time = datetime.datetime.fromtimestamp(int(record.get("timestamp")))
             if record_time <= end_time and record_time >= start_time:
-                more_info = extract_more_in_subscan(record)
+                more_info = extract_seller_from_subscan(record)
                 record.update(more_info)
                 record.update({"timestamp": record_time})
                 fetch_data.append(record)
@@ -72,12 +87,12 @@ class MoonbeansTradeDataExtractor(BaseExtractor):
                     {
                         "tid": record.get("id"),
                         "ttype": record.get("type"),
-                        "collectionId": standard_address(record.get("collectionId", "")),
+                        "contractAddress": standard_address(record.get("collectionId", "")),
                         "tokenId": int(record.get("id", "").split("-")[1]),
                         "buyer": standard_address(record.get("buyer", "")),
                         "seller": standard_address(record.get("seller", "")),
                         "value": int(record.get("value", 0))/1e18,
-                        "timestamp": record.get("timestamp").strftime('%Y-%m-%d %H:%M:%S.%f'),
+                        "timestamp": record.get("timestamp").strftime(DATETIME_FORMATTER),
                         "tx": record.get("tx")
                     }
                 )
@@ -85,6 +100,7 @@ class MoonbeansTradeDataExtractor(BaseExtractor):
                 print(record.get("tx"))
                 get_logger().error(e)
                 traceback.print_exc()
+        get_logger().debug(f"extracted: {len(fetch_data)} records")
         return extracted_data
     
     def init_table(self):
@@ -96,46 +112,26 @@ class MoonbeansTradeDataExtractor(BaseExtractor):
             get_logger().error(e)
             traceback.print_exc()
 
-    def insert(self, record: dict):
-        get_logger().debug("insert " + json.dumps(record))
+    def bulk_upsert(self, records: list[dict]):
         try:
-            MoonbeansTradeData.create(
-                tid=record.get("tid"),
-                ttype=record.get("type"),
-                collectionId=record.get("collectionId"),
-                tokenId=record.get("tokenId"),
-                buyer=record.get("buyer"),
-                seller=record.get("seller"),
-                value=record.get("value"),
-                tx=record.get("tx"),
-                timestamp=record.get("timestamp")
-            )
+            query = MoonbeansTradeData.insert_many(records)
+            query = query.on_conflict(
+                        conflict_target=[MoonbeansTradeData.tid,],
+                        update={
+                            "ttype": peewee.EXCLUDED.ttype,
+                            "contractAddress": peewee.EXCLUDED.contractAddress,
+                            "tokenId": peewee.EXCLUDED.tokenId,
+                            "buyer": peewee.EXCLUDED.buyer,
+                            "seller": peewee.EXCLUDED.seller,
+                            "tx": peewee.EXCLUDED.tx,
+                            "value": peewee.EXCLUDED.value,
+                            "timestamp": peewee.EXCLUDED.timestamp
+                                        
+                        })
+            query.execute()
+            get_logger().debug(f"upsert: {len(records)} records")
         except Exception as e:
             get_logger().error(e)
             traceback.print_exc()
-
-    def update(self, record: dict):
-        get_logger().debug("update " + json.dumps(record))
-        tid = record.get("tid")
-        try:
-            update_query = MoonbeansTradeData\
-                .update(record)\
-                .where(MoonbeansTradeData.tid == tid)
-            update_query.execute()
-        except Exception as e:
-            get_logger().error(e)
-            traceback.print_exc()
-
-    def exist(self, record: dict) -> bool:
-        record_exists = False
-        tid = record.get("tid", None)
-        if tid:
-            record_exists = MoonbeansTradeData\
-                .select("tid")\
-                .where(MoonbeansTradeData.tid == tid)\
-                .exists()
-        else:
-            raise ValueError("tid is empty!!")
-        return record_exists
 
 
