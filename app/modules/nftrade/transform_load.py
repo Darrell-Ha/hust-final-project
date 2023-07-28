@@ -36,33 +36,30 @@ class NftradeTransformer(NftTransformer):
         process_data['typeRec'] = process_data['typeRec'].apply(translate_type)
         process_data['source_record'] = 'nftrade'
         
-        # Fill Null value
-        for field in {"owner_name", "max_supply", "total_supply", "link",
-                      "descriptions", "owner_address", "buyer_name", "seller_name", "tx"}:
-            process_data[field] = None
 
         # Extract
         process_data = process_data.rename(
             columns={
                 "createdAt": "date_id",
+                "fromUser": "seller_address",
+                "toUser": "buyer_address",
+                "chain": "chain_slug",
                 "contractAddress": "contract_address",
                 "contractName": "contract_name",
-                "toUser": "buyer_address",
-                "fromUser": "seller_address",
-                "chain": "chain_slug",
-                "typeRec": "type_activities",
                 "tokenId": "token_id",
+                "tokenName": "token_unique_name",
+                "tokenImage": "token_images",
+                "typeRec": "type_activities",
+                "source_record": "source_record",
                 "price": "value",
                 "unit_usd": "unit_usd",
                 "usd_value": "usd_value",
             }
         )
-        process_data = process_data[["date_id", "contract_address", "contract_name",\
-                                     "owner_name", "max_supply", "total_supply",\
-                                     "descriptions", "owner_address", "buyer_name", "seller_name", "tx",\
-                                     "buyer_address", "seller_address", "chain_slug",\
-                                     "type_activities", "token_id",  "value", "link",\
-                                     "unit_usd", "usd_value", "source_record"]]
+        process_data = process_data[["date_id","seller_address","buyer_address","chain_slug",\
+                                     "contract_address","contract_name","token_id","token_unique_name",\
+                                     "token_images","type_activities","source_record","value",\
+                                     "unit_usd","usd_value"]]
         
         get_logger().debug(f"transformed: {len(process_data)}")
 
