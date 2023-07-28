@@ -28,8 +28,8 @@ class NftTransformer(BaseTransformLoad):
     """
 
     # Specify time to run ETL process from raw_area to dw_area (or it can be seen as how we'll query new records in each table manually)
-    # START_TIME = datetime.datetime.now()-datetime.timedelta(days=2)
-    START_TIME = datetime.datetime(2022, 1, 18)
+    START_TIME = datetime.datetime.now()-datetime.timedelta(days=2)
+    # START_TIME = datetime.datetime(2022, 1, 18)
     # END_TIME = datetime.datetime.now()
     END_TIME = datetime.datetime.now()
 
@@ -376,10 +376,5 @@ class NftTransformer(BaseTransformLoad):
         except Exception as e:
             get_logger().error(e)
             traceback.print_exc()
-
-        # return process_records
     
-
-
-
 
