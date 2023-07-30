@@ -57,7 +57,7 @@ args = {
 with DAG(
         dag_id = 'NFT_pipeline',
         default_args = args,
-        schedule_interval = "0 2 * * *",
+        schedule_interval = "15 2 * * *",
         tags = ['final_thesis'],
         start_date = (datetime.today() - timedelta(days = 1)),
         concurrency = 2,

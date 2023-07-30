@@ -16,11 +16,11 @@ def standard_address(ca: str):
 def extract_seller_from_subscan(record: dict):
     tid = record.get("id")
     contractAddress = standard_address(record.get("collectionId"))
-    collection_record = (MoonbeansCollectionData\
-                        .select(MoonbeansCollectionData.contractAddress, MoonbeansCollectionData.chain)\
-                        .where(MoonbeansCollectionData.contractAddress == contractAddress))
+    chain = MoonbeansCollectionData\
+            .select(MoonbeansCollectionData.chain)\
+            .where(MoonbeansCollectionData.contractAddress == contractAddress)\
+            .scalar()
     tx = tid.split("-")[2]
-    chain = collection_record[0].chain
     try:
         r = getinfo(network=chain, endpoint="/evm/transaction", json_data={"hash": tx}, version=1)
         transfer_info = r.get("token_transfers", [{}])
@@ -86,7 +86,6 @@ class MoonbeansTradeDataExtractor(BaseExtractor):
                 extracted_data.append(
                     {
                         "tid": record.get("id"),
-                        "ttype": record.get("type"),
                         "contractAddress": standard_address(record.get("collectionId", "")),
                         "tokenId": int(record.get("id", "").split("-")[1]),
                         "buyer": standard_address(record.get("buyer", "")),
@@ -118,7 +117,6 @@ class MoonbeansTradeDataExtractor(BaseExtractor):
             query = query.on_conflict(
                         conflict_target=[MoonbeansTradeData.tid,],
                         update={
-                            "ttype": peewee.EXCLUDED.ttype,
                             "contractAddress": peewee.EXCLUDED.contractAddress,
                             "tokenId": peewee.EXCLUDED.tokenId,
                             "buyer": peewee.EXCLUDED.buyer,

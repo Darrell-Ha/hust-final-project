@@ -4,7 +4,6 @@ from core.config import DATETIME_FORMATTER
 
 class MoonbeansTradeData(peewee.Model):
     tid = peewee.CharField(max_length=200, primary_key=True)
-    ttype = peewee.CharField(max_length=10, null=True)
     contractAddress = peewee.CharField(max_length=50)
     tokenId = peewee.IntegerField()
     buyer = peewee.CharField(max_length=50)

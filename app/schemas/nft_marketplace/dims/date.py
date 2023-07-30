@@ -1,12 +1,13 @@
 import peewee
 from core.core import get_dw_database
-from core.config import DATETIME_FORMATTER
+from core.config import DATETIME_FORMATTER, DATE_FORMATTER
 
 
 class DimDate(peewee.Model):
 
     date_id=peewee.BigIntegerField(primary_key=True)
     date_actual=peewee.DateTimeField(formats=DATETIME_FORMATTER)
+    date_time=peewee.DateTimeField(formats=DATE_FORMATTER)
     day_of_week=peewee.IntegerField()
     day_of_month=peewee.IntegerField()
     month=peewee.IntegerField()

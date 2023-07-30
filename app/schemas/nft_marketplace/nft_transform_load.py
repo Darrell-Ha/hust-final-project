@@ -9,7 +9,7 @@ from .facts.activities import FactActivities
 from modules.santiment.models import SantimentPriceChain
 from core.base_transform_load import BaseTransformLoad
 from core.core import get_logger
-from core.config import DATETIME_FORMATTER
+from core.config import DATETIME_FORMATTER, DATE_FORMATTER
 import pandas as pd
 import json
 import datetime
@@ -186,6 +186,7 @@ class NftTransformer(BaseTransformLoad):
         """
         process_time = date_ids.drop_duplicates().copy()
         process_time['date_actual'] = pd.to_datetime(process_time['date_id']).dt.strftime(DATETIME_FORMATTER)
+        process_time['date_time'] = process_time['date_id'].dt.strftime(DATE_FORMATTER)
         process_time['day_of_week'] = process_time['date_id'].dt.day_of_week + 2
         process_time['day_of_month'] = process_time['date_id'].dt.day
         process_time['month'] = process_time['date_id'].dt.month
@@ -360,7 +361,6 @@ class NftTransformer(BaseTransformLoad):
             query = query.on_conflict(
                 conflict_target=[
                     FactActivities.date_id,
-                    FactActivities.buyer_address,
                     FactActivities.seller_address,
                     FactActivities.nft_id,
                     FactActivities.type_activities,
